@@ -8,13 +8,17 @@ import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.UpdateData;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.spigotmc.SpigotConfig;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 生命 - 当前不更新怪物生命
@@ -22,6 +26,18 @@ import java.util.List;
  * @author Saukiya
  */
 public class Health extends SubAttribute {
+
+    public static final String MC_ATTRIBUTE_NAME = "health";
+    public static final NamespacedKey MC_ATTRIBUTE_KEY = new NamespacedKey(SXAttribute.getInst(), MC_ATTRIBUTE_NAME);
+    /**
+     * 哈哈哈我用随机 UUID 发生器生成的, 够随机吧
+     */
+    public static final UUID MC_ATTRIBUTE_ID = UUID.fromString("fedfdec8-7baa-47bc-80cd-5665a187da52");
+    /**
+     * 用来移除 AttributeModifier 的 AttributeModifier...
+     * 仅用到它的 id.
+     */
+    public static final AttributeModifier MC_ATTRIBUTE_MODIFIER_REMOVER = new AttributeModifier(MC_ATTRIBUTE_ID, MC_ATTRIBUTE_NAME, 0, AttributeModifier.Operation.ADD_NUMBER);
 
     private boolean skillAPI = false;
 
@@ -54,9 +70,18 @@ public class Health extends SubAttribute {
                 SkillAPI.getPlayerData(player).getAttribute(AttributeManager.HEALTH);
             }
             double maxHealth = values[0] + getSkillAPIHealth(player);
-            if (player.getHealth() > maxHealth) player.setHealth(maxHealth);
+//            if (player.getHealth() > maxHealth) player.setHealth(maxHealth);
             if (SXAttribute.getVersionSplit()[1] > 8) {
-                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+                AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+                assert attribute != null : "Player '" + player.getUniqueId() + "' doesn't have attribute '" + Attribute.GENERIC_MAX_HEALTH + "'";
+                double baseValue = attribute.getBaseValue();
+                double mod = maxHealth - getDefaultValue();
+                attribute.removeModifier(MC_ATTRIBUTE_MODIFIER_REMOVER);
+                if (mod != 0) {
+                    AttributeModifier modifier = new AttributeModifier(MC_ATTRIBUTE_ID, MC_ATTRIBUTE_NAME, mod, AttributeModifier.Operation.ADD_NUMBER);
+                    attribute.addModifier(modifier);
+                }
+//                attribute.setBaseValue(maxHealth);
             } else {
                 player.setMaxHealth(maxHealth);
             }

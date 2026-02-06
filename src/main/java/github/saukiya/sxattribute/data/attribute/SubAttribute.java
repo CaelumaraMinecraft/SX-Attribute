@@ -287,4 +287,12 @@ public abstract class SubAttribute extends Message.Tool implements Comparable<Su
         }
         return null;
     }
+
+    /**
+     * 获取在 Default. 配置的值默认值.
+     */
+    public double getDefaultValue() {  // TODO 检查正确性
+        return SXAttribute.getAttributeManager().defaultAttributeData().getValues(this)[0];
+    }
+
 }

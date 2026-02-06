@@ -20,6 +20,7 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import ru.endlesscode.rpginventory.inventory.InventoryManager;
 
 import java.util.*;
@@ -256,5 +257,9 @@ public class SXAttributeManager implements Listener {
         } else {
             entityDataMap.remove(entity.getUniqueId());
         }
+    }
+
+    public @Nullable SXAttributeData defaultAttributeData() {
+        return defaultAttributeData;
     }
 }
