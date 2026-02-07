@@ -8,6 +8,7 @@ import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +54,11 @@ public class Defense extends SubAttribute {
     public void eventMethod(double[] values, EventData eventData) {
         if (eventData instanceof DamageData) {
             DamageData damageData = (DamageData) eventData;
+
+            if (damageData.getEvent().getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && damageData.getEvent().getCause() != EntityDamageEvent.DamageCause.PROJECTILE && damageData.getEvent().getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK && damageData.getEvent().getCause() != EntityDamageEvent.DamageCause.FALL && damageData.getEvent().getCause() != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) {
+                return;
+            }
+
             if (!damageData.getEffectiveAttributeList().contains("Real")) {
                 damageData.takeDamage(getAttribute(values, TYPE_DEFAULT));
                 damageData.takeDamage(getAttribute(values, damageData.getAttacker() instanceof Player ? TYPE_PVP : TYPE_PVE));
